@@ -18,7 +18,8 @@ David would gain 41 happiness units by sitting next to Carol.`;
 
 
 const testCases = [
-    {input: testData, expected: 330},
+    //{input: testData, expected: 330},
+    {input: file, expected: 0},
 ];
 
 testCases.forEach(({input, expected}) => {

@@ -11,6 +11,7 @@ type Person = {
 export class Day13 {
 
     persons!: Person[];
+    permutations: Neighbour[] = [];
 
     constructor(
         private input: string
@@ -18,30 +19,52 @@ export class Day13 {
     }
 
     part1() {
-        this.inputParser(this.input);
-        let nextPerson = this.persons[0];
-        let resultNames = [nextPerson.name];
-        let nextNeighbour = this.getMaxHappiness(nextPerson.name);
-        let resultHappiness = nextNeighbour.happiness;
+        this.inputParser();
+        //console.dir(this.persons, {depth: null})
 
-        for (let i = 0; i < this.persons.length - 1; i++) {
+        for (let i = 0; i < this.persons.length; i++) {
+            for (let j = this.persons[i].neighbours.length - 1; j >= 0; j--) {
+                const name1 = this.persons[i].name;
+                const name2 = this.persons[i].neighbours[j].name;
+                const happiness = this.persons[i].neighbours[j].happiness
+                const indexOfNeighbour = this.persons.indexOf(this.persons.find(person => person.name === name2)!);
+                const indexOfPersonInNeighbour = this.persons[indexOfNeighbour].neighbours.indexOf(this.persons[indexOfNeighbour].neighbours.find(neigh => neigh.name === name1)!);
 
-            nextPerson = this.persons.find(person =>
-                person.name === this.getMaxHappiness(nextPerson.name).name)!;
-            nextNeighbour = this.getMaxHappiness(nextPerson.name);
-            resultNames.push(nextPerson.name);
-            resultHappiness += nextNeighbour.happiness;
-            nextPerson.neighbours.splice(nextPerson.neighbours.indexOf(nextNeighbour), 1);
+                const happiness2 = this.persons[indexOfNeighbour].neighbours[indexOfPersonInNeighbour].happiness;
+                this.persons[i].neighbours.splice(j, 1);
+                this.persons[indexOfNeighbour].neighbours.splice(indexOfPersonInNeighbour, 1);
+                this.permutations.push({name: `${name1}, ${name2}`, happiness: happiness + happiness2});
+            }
+        }
+        this.permutations.sort((a, b) => b.happiness - a.happiness);
+        console.log(this.permutations)
+
+        /*let person = this.persons[0];
+        let names = [person.name];
+        let neighbour = person.neighbours[0];
+        person.neighbours.splice(person.neighbours.indexOf(neighbour), 1);
+        let sumHappiness = neighbour.happiness;
+
+        for (let i = 0; i < this.persons.length - 2; i++) {
+            //person.neighbours.splice(person.neighbours.indexOf(neighbour), 1);
+            person = this.persons.find(person => person.name === neighbour.name)!;
+            sumHappiness += person.neighbours.find(person => person.name === names[names.length - 1])!.happiness;
+            person.neighbours.splice(person.neighbours.indexOf(person.neighbours.find(person => person.name === names[names.length - 1])!), 1);
+
+            while (names.includes(person.neighbours[0].name)) {
+                person.neighbours.splice(0, 1);
+            }
+            neighbour = person.neighbours[0];
+            names.push(person.name);
+            sumHappiness += neighbour.happiness;
         }
 
-        const lastPerson = this.persons.find(person =>
-            person.name === this.getMaxHappiness(resultNames[resultNames.length - 1]).name)!;
-        resultHappiness += this.getMaxHappiness(lastPerson.name).happiness;
-        resultHappiness += this.getSecondMaxHappiness(this.persons[0].name).happiness;
-        console.log(resultNames)
-        console.log(resultHappiness)
-        console.dir(this.persons, {depth: null})
-        return resultHappiness;
+        person = this.persons.find(person => person.name === neighbour.name)!;
+        sumHappiness += person.neighbours.find(person => person.name === names[names.length - 1])!.happiness;
+        sumHappiness += person.neighbours.find(neigh => neigh.name === this.persons[0].name)!.happiness;
+        sumHappiness += this.persons[0].neighbours.find(neigh => neigh.name === person.name)!.happiness;*/
+
+        return sumHappiness;
     }
 
 
@@ -61,9 +84,9 @@ export class Day13 {
     }
 
 
-    inputParser(input: string) {
+    inputParser() {
         this.persons = [];
-        const lines = input.split('\n');
+        const lines = this.input.split(/\n|\r\n/);
         const PERSON_NAME_REGEX = /^\w+/;
         const NEIGHBOUR_NAME_REGEX = /\w+(?=\.$)/;
         const HAPPINESS = /\w+\s\d+/;
@@ -91,5 +114,8 @@ export class Day13 {
                 });
             }
         }
+        this.persons.forEach(
+            person => person.neighbours.sort((a, b) => b.happiness - a.happiness)
+        );
     }
 }
