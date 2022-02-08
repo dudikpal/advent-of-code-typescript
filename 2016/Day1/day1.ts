@@ -6,34 +6,35 @@ type Coord = {
 export class Day1 {
 
     commands: string[] = [];
-    coord: Coord;
     coordinates: string[] = [];
-    bunnyHQ: Coord;
+    coord!: Coord;
+    bunnyHQ!: Coord;
+
 
     constructor(input: string) {
         this.commands = input.split(', ');
     }
 
+
     day1() {
         this.coord = {x: 0, y: 0};
         let direction = 'N';
+        this.coordinates.push('0:0');
 
         for (const instruction of this.commands) {
 
             direction = this.commandProcessor(direction, instruction);
         }
 
-        console.log(this.coordinates)
         const part1 = Math.abs(this.coord.x) + Math.abs(this.coord.y);
-        const part2 = Math.abs(this.bunnyHQ?.x) + Math.abs(this.bunnyHQ?.y);
+        const part2 = Math.abs(this.bunnyHQ.x) + Math.abs(this.bunnyHQ.y);
+
         return {part1: part1, part2: part2};
     }
 
 
-
-
-
     addDistance(direction: string, num: number) {
+
         switch (direction) {
             case 'N':
                 this.coord.y += num; break;
@@ -48,6 +49,7 @@ export class Day1 {
 
 
     changeDirection(direction: string, command: string) {
+
         switch (direction) {
             case 'N':
                 return command === 'R' ? 'E' : 'W';
@@ -62,44 +64,49 @@ export class Day1 {
 
 
     commandProcessor(direction: string, instruction: string) {
+
         let num = +instruction.match(/\d+$/)![0];
         let command = instruction.match(/^\D+/)![0];
+        let fromCoord = {x: this.coord.x, y: this.coord.y};
 
         direction = this.changeDirection(direction, command)!;
-        const fromCoord = {x: this.coord.x, y: this.coord.y};
         this.addDistance(direction, num);
+
         const toCoord = {x: this.coord.x, y: this.coord.y}
 
+        fromCoord = {x: fromCoord.x + this.addition(fromCoord.x, toCoord.x), y: fromCoord.y + this.addition(fromCoord.y, toCoord.y) };
 
-        const arrX = Array.from({
-                length: fromCoord.x !== toCoord.x ?
-                    this.abs(this.abs(fromCoord.x) - this.abs(toCoord.x))
-                    : 1
-            },
-            (_, i) => i + Math.min(fromCoord.x, toCoord.x));
+        const minX = Math.min(fromCoord.x, toCoord.x);
+        const maxX = Math.max(fromCoord.x, toCoord.x);
+        const minY = Math.min(fromCoord.y, toCoord.y);
+        const maxY = Math.max(fromCoord.y, toCoord.y);
 
-        const arrY = Array.from({
-                length: fromCoord.y !== toCoord.y
-                    ? this.abs(toCoord.y - fromCoord.y)
-                    : 1
-            },
-            (_, i) => i + Math.min(fromCoord.y, toCoord.y));
+        for (let i = minX; i <= maxX; i++) {
 
-        for (let i = 0; i < arrX.length; i++) {
-            for (let j = 0; j < arrY.length; j++) {
-                if (!this.bunnyHQ && this.coordinates.includes(`${arrX[i]}:${arrY[j]}`)) {
-                    this.bunnyHQ = {x: this.coord.x, y: this.coord.y}
+            for (let j = minY; j <= maxY; j++) {
+
+                if (!this.bunnyHQ && this.coordinates.includes(`${i}:${j}`)) {
+
+                    this.bunnyHQ = {x: i, y: j}
                 }
-                this.coordinates.push(`${arrX[i]}:${arrY[j]}`);
+                this.coordinates.push(`${i}:${j}`);
             }
         }
-        this.coordinates.push(`${toCoord.x}:${toCoord.y}`);
 
         return direction;
     }
 
 
-    abs(num:number) {
-        return Math.abs(num);
+    addition(num1: number, num2: number) {
+
+        if (num1 - num2 === 0) {
+            return 0;
+        }
+
+        if (num1 - num2 > 0) {
+            return -1;
+        }
+
+        return 1;
     }
 }
