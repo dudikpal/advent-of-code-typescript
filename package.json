@@ -18,6 +18,7 @@
   "dependencies": {
     "jest": "^27.4.7",
     "md5": "^2.3.0",
+    "md5-typescript": "^1.0.5",
     "node": "^17.4.0"
   }
 }
