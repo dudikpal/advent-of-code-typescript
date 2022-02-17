@@ -1,7 +1,7 @@
 export class Day7 {
 
     private lines: string[];
-    private readonly REGEX_HYPERNET = /\[\w+\]/g;
+    private readonly REGEX_HYPERNET = /\[\w+]/g;
 
     constructor(
         private input: string
@@ -47,21 +47,40 @@ export class Day7 {
         // [any]
         const hypernet = line.match(this.REGEX_HYPERNET);
         // any[ ]any
-        //const supernet = line.match(/\w+(?=(((?!\]).)*\[)|[^\[\]]*$)/g);
-        const supernetAbabab = Array.from(line.matchAll(/(\w)((?!\1)\w)(\1)(?=(((?!\]).)*\[)|[^\[\]]*$)/g));
-        const ababab = /(\w)((?!\1)\w)(\1)/g;
+        const supernet = line.match(/\w+(?=(((?!]).)*\[)|[^\[\]]*$)/g);
+       // const ababab = /(?=((\w)((?!2)\w)\2))/g;
+        const ababab = /(\w)((?!\1)\w)\1/g;
 
-        if (supernetAbabab) {
+        for (let word of supernet) {
 
-            for (const word of supernetAbabab[0]) {
+            const aba = word.match(ababab);
 
-                const flippedWord = word.charAt(1).concat(word.charAt(0)).concat(word.charAt(1));
-                if (hypernet.filter(net => net.includes(flippedWord)).length > 0) {
-                    return true;
+            while (word.length >= 3) {
+
+                const aba = word.match(ababab);
+
+                if (aba) {
+
+                    for (const item of aba) {
+
+                        const flippedWord = item.charAt(1).concat(item.charAt(0)).concat(item.charAt(1));
+
+                        if (hypernet.filter(net => net.includes(flippedWord)).length > 0) {
+
+                            return true;
+                        }
+
+                    }
+
+                    word = word.substr(word.indexOf(aba[0]) + 1);
+
+                } else {
+
+                    word = '';
                 }
             }
         }
-        console.log(supernetAbabab)
+
         return false;
     }
 

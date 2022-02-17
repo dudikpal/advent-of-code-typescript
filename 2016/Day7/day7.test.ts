@@ -21,10 +21,10 @@ testCases.forEach(({input, expected}) => {
 });
 
 const testCases2 = [
-    {input: `aba[bab]xyz
+    {input: `zazbz[bzb]cdb
 xyx[xyx]xyx
 aaa[kek]eke
-zazbz[bzb]cdb`, expected: 3},
+aba[bab]xyz`, expected: 3},
     {input: file, expected: 242},
 ];
 
